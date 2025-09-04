@@ -16,17 +16,16 @@ $app = new Laravel\Lumen\Application(
 $app->withFacades();
 $app->withEloquent();
 
-// Redis alias is automatically available through the service provider
-
 // Service Container Bindings
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
+    App\Exceptions\Handler::class,
+
 );
 
 $app->singleton(
-    Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
+    Illuminate\Contracts\Routing\ResponseFactory::class,
+    Laravel\Lumen\Http\ResponseFactory::class
 );
 
 // Configuration
@@ -38,8 +37,6 @@ $app->configure('jwt');
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
-
-// JWT aliases are automatically available through the service provider
 
 $app->middleware([
     App\Http\Middleware\CorsMiddleware::class,

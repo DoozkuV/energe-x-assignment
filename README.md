@@ -48,7 +48,7 @@ git clone <repository-url>
 cd energe-x
 
 # Build and start all services
-docker-compose up --build
+docker compose up --build
 
 # The application will be available at:
 # - Frontend: http://localhost
@@ -61,7 +61,7 @@ docker-compose up --build
 ### Development Mode - Database Only
 ```bash
 # Start only database services for local development
-docker-compose -f docker-composer.dev.yml up -d
+docker compose -f docker-composer.dev.yml up -d
 
 # This starts MySQL and Redis containers
 # Then run individual services locally for development
@@ -72,7 +72,7 @@ docker-compose -f docker-composer.dev.yml up -d
 ### 1. Database Services
 ```bash
 # Start MySQL and Redis
-docker-compose -f docker-composer.dev.yml up -d
+docker compose -f docker-composer.dev.yml up -d
 ```
 
 ### 2. Lumen API Setup
@@ -159,8 +159,8 @@ cd node-cache
 npm test
 
 # Or run via Docker
-docker-compose exec lumen-api vendor/bin/phpunit
-docker-compose exec cache-service npm test
+docker compose exec lumen-api vendor/bin/phpunit
+docker compose exec cache-service npm test
 ```
 
 ### CI/CD Pipeline
@@ -219,18 +219,18 @@ DB_NAME=energex
 
 ```bash
 # Check if services are running
-docker-compose ps
+docker compose ps
 
 # View service logs
-docker-compose logs lumen-api
-docker-compose logs cache-service
-docker-compose logs frontend
+docker compose logs lumen-api
+docker compose logs cache-service
+docker compose logs frontend
 
 # Check MySQL connection
-docker-compose exec db mysql -u energe_user -p energex
+docker compose exec db mysql -u energe_user -p energex
 
 # Check Redis connection  
-docker-compose exec redis redis-cli ping
+docker compose exec redis redis-cli ping
 ```
 
 ## 🛠️ Troubleshooting
@@ -245,11 +245,11 @@ docker-compose exec redis redis-cli ping
 ### Reset Everything
 ```bash
 # Stop and remove all containers, networks, volumes
-docker-compose down -v
+docker compose down -v
 docker system prune -f
 
 # Rebuild from scratch
-docker-compose up --build
+docker compose up --build
 ```
 
 ## 📝 Development Notes
