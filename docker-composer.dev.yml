@@ -1,0 +1,24 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: energex_db_dev
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: energex
+      MYSQL_USER: energe_user
+      MYSQL_PASSWORD: energe_pass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata_dev:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    container_name: energex_redis_dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+volumes:
+  dbdata_dev:

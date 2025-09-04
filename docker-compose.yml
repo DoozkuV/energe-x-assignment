@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:11
+    container_name: energex_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: energex
+      MYSQL_USER: energe_user
+      MYSQL_PASSWORD: energe_pass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: energex_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  migrate:
+    build: ./lumen-api
+    container_name: energex_migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - APP_ENV=production
+      - DB_HOST=db
+      - DB_DATABASE=energex
+      - DB_USERNAME=energe_user
+      - DB_PASSWORD=energe_pass
+    command: php artisan migrate --force
+    restart: "no"
+
+  lumen-api:
+    build: ./lumen-api
+    container_name: energex_lumen_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    environment:
+      - APP_ENV=production
+      - DB_HOST=db
+      - DB_DATABASE=energex
+      - DB_USERNAME=energe_user
+      - DB_PASSWORD=energe_pass
+      - REDIS_HOST=redis
+      - CACHE_DRIVER=redis
+
+  cache-service:
+    build: ./node-cache
+    container_name: energex_cache_service
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=energe_user
+      - DB_PASS=energe_pass
+      - DB_NAME=energex
+      - REDIS_URL=redis://redis:6379
+
+  frontend:
+    build: ./frontend
+    container_name: energex_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - lumen-api
+      - cache-service
+
+volumes:
+  dbdata:
