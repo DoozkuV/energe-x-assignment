@@ -16,17 +16,20 @@ $app = new Laravel\Lumen\Application(
 $app->withFacades();
 $app->withEloquent();
 
+// Bind Lumen's ResponseFactory to the interface for dependency injection
+$app->bind(Illuminate\Contracts\Routing\ResponseFactory::class, Laravel\Lumen\Http\ResponseFactory::class);
+
 // Service Container Bindings
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class,
-
 );
 
 $app->singleton(
-    Illuminate\Contracts\Routing\ResponseFactory::class,
-    Laravel\Lumen\Http\ResponseFactory::class
+    Illuminate\Contracts\Console\Kernel::class,
+    App\Console\Kernel::class,
 );
+
 
 // Configuration
 $app->configure('app');
