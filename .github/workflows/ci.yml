@@ -1,5 +1,5 @@
 # GitHub Actions CI pipeline
-# Runs PHPUnit tests for Lumen and Jest tests for Node.js
+# Runs PHPUnit tests for Lumen and Jest tests for Node.js, then builds Docker application
 
 name: CI
 on:
@@ -35,4 +35,14 @@ jobs:
           node-version: "20"
       - run: npm ci
       - run: npm test --silent
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [php-tests, node-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker application
+        run: docker compose build
+      - name: Verify Docker build
+        run: docker images
 # vim: set filetype=yaml :
